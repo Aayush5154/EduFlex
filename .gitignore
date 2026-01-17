@@ -10,7 +10,7 @@ node_modules/
 dist/
 build/
 
-# IDE
+# IDE/Editor
 .vscode/
 .idea/
 *.swp
@@ -29,3 +29,4 @@ coverage/
 
 # Misc
 *.pem
+.gemini/
