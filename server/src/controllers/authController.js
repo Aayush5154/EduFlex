@@ -162,3 +162,94 @@ exports.getMe = async (req, res) => {
         });
     }
 };
+
+// @desc    Update user streak (called on login/activity)
+// @route   POST /api/auth/streak
+// @access  Private
+exports.updateStreak = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        let currentStreak = user.currentStreak || 0;
+        let longestStreak = user.longestStreak || 0;
+        const lastActive = user.lastActiveDate ? new Date(user.lastActiveDate) : null;
+
+        if (lastActive) {
+            lastActive.setHours(0, 0, 0, 0);
+            const diffDays = Math.floor((today - lastActive) / (1000 * 60 * 60 * 24));
+
+            if (diffDays === 0) {
+                // Same day, no update needed
+                return res.status(200).json({
+                    success: true,
+                    data: {
+                        currentStreak: user.currentStreak,
+                        longestStreak: user.longestStreak,
+                        lastActiveDate: user.lastActiveDate
+                    }
+                });
+            } else if (diffDays === 1) {
+                // Consecutive day
+                currentStreak += 1;
+            } else {
+                // Streak broken
+                currentStreak = 1;
+            }
+        } else {
+            // First activity
+            currentStreak = 1;
+        }
+
+        // Update longest streak
+        if (currentStreak > longestStreak) {
+            longestStreak = currentStreak;
+        }
+
+        // Save updates
+        user.currentStreak = currentStreak;
+        user.longestStreak = longestStreak;
+        user.lastActiveDate = today;
+        await user.save();
+
+        res.status(200).json({
+            success: true,
+            data: {
+                currentStreak,
+                longestStreak,
+                lastActiveDate: today
+            }
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Error updating streak',
+            error: error.message
+        });
+    }
+};
+
+// @desc    Get user streak
+// @route   GET /api/auth/streak
+// @access  Private
+exports.getStreak = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+
+        res.status(200).json({
+            success: true,
+            data: {
+                currentStreak: user.currentStreak || 0,
+                longestStreak: user.longestStreak || 0,
+                lastActiveDate: user.lastActiveDate
+            }
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Error fetching streak',
+            error: error.message
+        });
+    }
+};

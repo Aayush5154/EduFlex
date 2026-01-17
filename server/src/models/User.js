@@ -39,6 +39,26 @@ const userSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
+    currentStreak: {
+        type: Number,
+        default: 0
+    },
+    longestStreak: {
+        type: Number,
+        default: 0
+    },
+    lastActiveDate: {
+        type: Date,
+        default: null
+    },
+    xpPoints: {
+        type: Number,
+        default: 0
+    },
+    level: {
+        type: Number,
+        default: 1
+    },
     createdAt: {
         type: Date,
         default: Date.now

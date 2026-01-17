@@ -40,12 +40,14 @@ export const authAPI = {
     login: (email, password) => api.post('/auth/login', { email, password }),
     register: (data) => api.post('/auth/register', data),
     logout: () => api.post('/auth/logout'),
-    getMe: () => api.get('/auth/me')
+    getMe: () => api.get('/auth/me'),
+    getStreak: () => api.get('/auth/streak'),
+    updateStreak: () => api.post('/auth/streak')
 };
 
 // Playlists API
 export const playlistsAPI = {
-    getAll: () => api.get('/playlists'),
+    getAll: (params) => api.get('/playlists', { params }),
     getOne: (id) => api.get(`/playlists/${id}`),
     create: (data) => api.post('/playlists', data),
     enroll: (id) => api.post(`/playlists/${id}/enroll`),
@@ -115,6 +117,13 @@ export const todosAPI = {
     update: (id, data) => api.put(`/todos/${id}`, data),
     delete: (id) => api.delete(`/todos/${id}`),
     toggle: (id) => api.patch(`/todos/${id}/toggle`)
+};
+
+// Leaderboard API
+export const leaderboardAPI = {
+    getLeaderboard: () => api.get('/leaderboard'),
+    getMyXP: () => api.get('/leaderboard/me'),
+    addXP: (action) => api.post('/leaderboard/xp', { action })
 };
 
 export default api;

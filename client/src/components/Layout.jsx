@@ -15,11 +15,13 @@ import {
     FileText,
     PlusCircle,
     Sparkles,
-    CheckSquare
+    CheckSquare,
+    Trophy
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useOffline } from '../context/OfflineContext';
 import OfflineIndicator from './OfflineIndicator';
+import StreakCounter from './StreakCounter';
 import { clsx } from 'clsx';
 
 const Layout = ({ children }) => {
@@ -43,6 +45,7 @@ const Layout = ({ children }) => {
         : [
             { path: '/dashboard', icon: Home, label: 'Home' },
             { path: '/playlists', icon: BookOpen, label: 'Courses' },
+            { path: '/leaderboard', icon: Trophy, label: 'Leaderboard' },
             { path: '/todos', icon: CheckSquare, label: 'My Todos' },
             { path: '/notes', icon: FileText, label: 'Saved Notes' },
             { path: '/downloads', icon: Download, label: 'Downloads' },
@@ -83,8 +86,7 @@ const Layout = ({ children }) => {
                 )}
             >
                 <div className="flex flex-col h-full p-6">
-                    {/* Logo */}
-                    <Link to="/dashboard" className="flex items-center gap-3 mb-10">
+                    <Link to="/dashboard" className="flex items-center gap-3 mb-6">
                         <div className="p-2 rounded-xl bg-gradient-to-br from-primary-500 to-purple-600">
                             <GraduationCap className="w-8 h-8 text-white" />
                         </div>
@@ -93,6 +95,13 @@ const Layout = ({ children }) => {
                             <p className="text-xs text-gray-400">Learn Anywhere</p>
                         </div>
                     </Link>
+
+                    {/* Streak Counter - Students Only */}
+                    {!isTeacher && (
+                        <div className="mb-6">
+                            <StreakCounter />
+                        </div>
+                    )}
 
                     {/* Navigation */}
                     <nav className="flex-1 space-y-2">

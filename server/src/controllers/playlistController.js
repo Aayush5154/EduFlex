@@ -7,33 +7,50 @@ const User = require('../models/User');
 // @access  Public (with optional auth for user's own playlists)
 exports.getPlaylists = async (req, res) => {
     try {
-        // Get all published playlists with teacher info
-        const playlists = await Playlist.find({ isPublished: true })
-            .populate('teacher', 'name email role')
-            .sort('-createdAt');
+        const { myOnly } = req.query;
 
         // Get current user ID if authenticated
-        const currentUserId = req.user?.id;
+        let currentUserId = null;
+        if (req.user) {
+            currentUserId = req.user._id ? req.user._id.toString() : req.user.id;
+        }
 
-        // Filter to include:
-        // 1. Playlists created by teachers
-        // 2. User's own playlists (if logged in)
-        const filteredPlaylists = playlists.filter(playlist => {
-            if (!playlist.teacher) return false;
+        let playlists;
 
-            // Include if created by a teacher
-            if (playlist.teacher.role === 'teacher') return true;
+        // If myOnly is true, show only user's own playlists (both public and private)
+        if (myOnly === 'true' && currentUserId) {
+            playlists = await Playlist.find({ teacher: currentUserId })
+                .populate('teacher', 'name email role')
+                .sort('-createdAt');
+        } else {
+            // Default: Show all public playlists
+            playlists = await Playlist.find({ isPublished: true })
+                .populate('teacher', 'name email role')
+                .sort('-createdAt');
 
-            // Include if it's the current user's own playlist
-            if (currentUserId && playlist.teacher._id.toString() === currentUserId) return true;
+            // Filter to include:
+            // 1. Playlists created by teachers (public)
+            // 2. User's own public playlists (if logged in)
+            playlists = playlists.filter(playlist => {
+                if (!playlist.teacher) return false;
 
-            return false;
-        });
+                const creatorId = playlist.teacher._id.toString();
+                const creatorRole = playlist.teacher.role;
+
+                // Include if created by a teacher
+                if (creatorRole === 'teacher') return true;
+
+                // Include user's own public playlists
+                if (currentUserId && creatorId === currentUserId) return true;
+
+                return false;
+            });
+        }
 
         res.status(200).json({
             success: true,
-            count: filteredPlaylists.length,
-            data: filteredPlaylists
+            count: playlists.length,
+            data: playlists
         });
     } catch (error) {
         res.status(500).json({

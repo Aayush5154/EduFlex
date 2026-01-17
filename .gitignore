@@ -1,6 +1,5 @@
 # Dependencies
 node_modules/
-.pnpm-store/
 
 # Environment files
 .env
@@ -30,4 +29,3 @@ coverage/
 
 # Misc
 *.pem
-.gemini/

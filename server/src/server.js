@@ -16,6 +16,7 @@ const recommendationRoutes = require('./routes/recommendationRoutes');
 const aiRoutes = require('./routes/aiRoutes');
 const chatbotRoutes = require('./routes/chatbotRoutes');
 const todoRoutes = require('./routes/todoRoutes');
+const leaderboardRoutes = require('./routes/leaderboardRoutes');
 
 // Initialize app
 const app = express();
@@ -53,6 +54,7 @@ app.use('/api/recommendations', recommendationRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/chatbot', chatbotRoutes);
 app.use('/api/todos', todoRoutes);
+app.use('/api/leaderboard', leaderboardRoutes);
 
 // Health check route
 app.get('/api/health', (req, res) => {

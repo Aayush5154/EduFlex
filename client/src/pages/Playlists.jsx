@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, Plus, Filter } from 'lucide-react';
+import { Search, Plus, Filter, Eye, EyeOff, Lock } from 'lucide-react';
 import Layout from '../components/Layout';
 import PlaylistCard from '../components/PlaylistCard';
 import CreatePlaylistModal from '../components/modals/CreatePlaylistModal';
@@ -27,17 +27,18 @@ const Playlists = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('All');
     const [showCreateModal, setShowCreateModal] = useState(false);
+    const [showMyOnly, setShowMyOnly] = useState(false);
 
     useEffect(() => {
         fetchPlaylists();
-    }, [isOnline, isTeacher]);
+    }, [isOnline, isTeacher, showMyOnly]);
 
     const fetchPlaylists = async () => {
         try {
             if (isOnline) {
                 const res = isTeacher
                     ? await playlistsAPI.getMyPlaylists()
-                    : await playlistsAPI.getAll();
+                    : await playlistsAPI.getAll({ myOnly: showMyOnly });
                 setPlaylists(res.data.data);
                 await cachePlaylists(res.data.data);
             } else {
@@ -121,20 +122,45 @@ const Playlists = () => {
                 </div>
 
                 {/* Category Filters */}
-                <div className="flex items-center gap-2 overflow-x-auto pb-2">
-                    <Filter className="w-5 h-5 text-gray-400 flex-shrink-0" />
-                    {categories.map((category) => (
+                <div className="flex items-center justify-between gap-4 pb-2">
+                    <div className="flex items-center gap-2 overflow-x-auto">
+                        <Filter className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                        {categories.map((category) => (
+                            <button
+                                key={category}
+                                onClick={() => setSelectedCategory(category)}
+                                className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${selectedCategory === category
+                                    ? 'bg-primary-500 text-white'
+                                    : 'bg-slate-800 text-gray-400 hover:bg-slate-700 hover:text-white'
+                                    }`}
+                            >
+                                {category}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* My Playlists Toggle */}
+                    {!isTeacher && (
                         <button
-                            key={category}
-                            onClick={() => setSelectedCategory(category)}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${selectedCategory === category
-                                ? 'bg-primary-500 text-white'
-                                : 'bg-slate-800 text-gray-400 hover:bg-slate-700 hover:text-white'
+                            onClick={() => setShowMyOnly(!showMyOnly)}
+                            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${showMyOnly
+                                ? 'bg-primary-500/20 text-primary-400 border border-primary-500/30'
+                                : 'bg-slate-800 text-gray-400 hover:bg-slate-700'
                                 }`}
                         >
-                            {category}
+                            {showMyOnly ? (
+                                <>
+                                    <Eye className="w-4 h-4" />
+                                    My Playlists
+                                </>
+                            ) : (
+                                <>
+                                    <EyeOff className="w-4 h-4" />
+                                    All Courses
+                                </>
+                            )}
                         </button>
-                    ))}
+                    )}
                 </div>
 
                 {/* Offline Indicator */}
@@ -148,8 +174,10 @@ const Playlists = () => {
                 {filteredPlaylists.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         {filteredPlaylists.map((playlist) => {
-                            const isOwner = user && playlist.teacher &&
-                                (playlist.teacher._id === user._id || playlist.teacher === user._id);
+                            const teacherId = playlist.teacher?._id || playlist.teacher;
+                            const userId = user?.id || user?._id;
+                            const isOwner = user && teacherId && userId &&
+                                (teacherId.toString() === userId.toString() || teacherId === userId);
                             return (
                                 <PlaylistCard
                                     key={playlist._id || playlist.id}

@@ -10,6 +10,7 @@ import Player from './pages/Player';
 import Downloads from './pages/Downloads';
 import SavedNotes from './pages/SavedNotes';
 import Todos from './pages/Todos';
+import Leaderboard from './pages/Leaderboard';
 import LoadingSpinner from './components/LoadingSpinner';
 
 // Protected Route Component
@@ -125,6 +126,15 @@ function App() {
                             element={
                                 <ProtectedRoute>
                                     <Todos />
+                                </ProtectedRoute>
+                            }
+                        />
+
+                        <Route
+                            path="/leaderboard"
+                            element={
+                                <ProtectedRoute>
+                                    <Leaderboard />
                                 </ProtectedRoute>
                             }
                         />

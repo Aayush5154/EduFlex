@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X } from 'lucide-react';
+import { X, Globe, Lock } from 'lucide-react';
 import { playlistsAPI } from '../../api/api';
 
 const categories = [
@@ -23,7 +23,8 @@ const CreatePlaylistModal = ({ onClose, onSuccess }) => {
         description: '',
         category: 'technology',
         difficulty: 'beginner',
-        thumbnail: ''
+        thumbnail: '',
+        isPublic: true
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -46,7 +47,7 @@ const CreatePlaylistModal = ({ onClose, onSuccess }) => {
         try {
             await playlistsAPI.create({
                 ...formData,
-                isPublished: true
+                isPublished: formData.isPublic
             });
             onSuccess();
         } catch (err) {
@@ -160,6 +161,38 @@ const CreatePlaylistModal = ({ onClose, onSuccess }) => {
                             placeholder="https://example.com/image.jpg"
                             className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-primary-500"
                         />
+                    </div>
+
+                    {/* Public Toggle */}
+                    <div className="flex items-center justify-between p-4 bg-slate-700/50 rounded-lg">
+                        <div className="flex items-center gap-3">
+                            {formData.isPublic ? (
+                                <Globe className="w-5 h-5 text-green-400" />
+                            ) : (
+                                <Lock className="w-5 h-5 text-yellow-400" />
+                            )}
+                            <div>
+                                <p className="text-white font-medium">
+                                    {formData.isPublic ? 'Public Playlist' : 'Private Playlist'}
+                                </p>
+                                <p className="text-xs text-gray-400">
+                                    {formData.isPublic
+                                        ? 'Anyone can see and enroll in this playlist'
+                                        : 'Only you can see this playlist'}
+                                </p>
+                            </div>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => setFormData(prev => ({ ...prev, isPublic: !prev.isPublic }))}
+                            className={`relative w-12 h-6 rounded-full transition-colors ${formData.isPublic ? 'bg-green-500' : 'bg-slate-600'
+                                }`}
+                        >
+                            <span
+                                className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${formData.isPublic ? 'left-7' : 'left-1'
+                                    }`}
+                            />
+                        </button>
                     </div>
 
                     {/* Actions */}
