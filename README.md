@@ -12,6 +12,23 @@ An offline-first Learning Management System built for low-bandwidth regions (SDG
 - 🏆 **Leaderboard** - Compete with other students
 - 📴 **Offline Support** - Works without internet
 
+## Screenshots
+
+### Landing Page
+![Landing Page](screenshots/landing.png)
+
+### Dashboard
+![Dashboard](screenshots/dashboard.png)
+
+### Courses
+![Courses](screenshots/courses.png)
+
+### Leaderboard
+![Leaderboard](screenshots/leaderboard.png)
+
+### My Todos
+![My Todos](screenshots/todos.png)
+
 ## Tech Stack
 
 - **Frontend:** React, Vite, TailwindCSS
